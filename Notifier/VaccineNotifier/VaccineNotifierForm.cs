@@ -18,18 +18,22 @@ namespace VaccineNotifier
         private void VaccineNotifierForm_Load(object sender, EventArgs e)
         {
             speechSynthesizerObj = new SpeechSynthesizer();
-            timer1.Interval = 40000;
-            timer1.Start();
+            timer1.Interval = 40000;            
         }
         private void Timer1_Tick(object sender, System.EventArgs e)
+        {
+            StartSearch(txtPin.Text);
+        }
+        private void StartSearch(string pin)
         {
             try
             {
                 string result = "";
-                int dt = DateTime.Now.Day;
+                int dt = dateTimePicker1.Value.Day;
+                int month = dateTimePicker1.Value.Month;                
                 for (int a = dt; a <= 31; a++)
                 {
-                    string url = string.Concat("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=201301&date=", a.ToString(), "-05-2021");
+                    string url = string.Concat("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=",pin,"&date=", a.ToString(), "-",month.ToString(),"-2021");
                     var json = new WebClient().DownloadString(url);
                     timer1.Stop();
                     timer1.Interval = 40000;
@@ -52,7 +56,7 @@ namespace VaccineNotifier
                                 if (n12.ToString().Contains("18"))
                                 {
                                     result = string.Concat("Vaccine Available on ", obj3["date"].ToString(),
-                                        " at ",obj1["name"].ToString(), ". Available Slots ", obj3["available_capacity"].ToString());
+                                        " at ", obj1["name"].ToString(), ". Available Slots ", obj3["available_capacity"].ToString());
                                 }
                             }
                         }
@@ -69,7 +73,7 @@ namespace VaccineNotifier
                     speechSynthesizerObj.SpeakAsync(result);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 //speechSynthesizerObj = new SpeechSynthesizer();
@@ -78,6 +82,11 @@ namespace VaccineNotifier
                 timer1.Interval = 90000;
                 timer1.Start();
             }
+        }
+
+        private void btnStartTimer_Click(object sender, EventArgs e)
+        {
+            timer1.Start();            
         }
     }
 }
